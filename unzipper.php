@@ -54,10 +54,10 @@ class Unzipper {
       closedir($dh);
 
       if (!empty($this->zipfiles)) {
-        $GLOBALS['status'] = array('info' => '.zip or .gz or .rar files found, ready for extraction');
+        $GLOBALS['status'] = array('info' => 'Arquivos .zip, .gz ou .rar encontrados e prontos para extração');
       }
       else {
-        $GLOBALS['status'] = array('info' => 'No .zip or .gz or rar files found. So only zipping functionality available.');
+        $GLOBALS['status'] = array('info' => 'Nenhum arquivo .zip, .gz ou .rar encontrado. Somente a função de compactação está disponível.');
       }
     }
   }
@@ -121,7 +121,7 @@ class Unzipper {
   public static function extractZipArchive($archive, $destination) {
     // Check if webserver supports unzipping.
     if (!class_exists('ZipArchive')) {
-      $GLOBALS['status'] = array('error' => 'Error: Your PHP version does not support unzip functionality.');
+      $GLOBALS['status'] = array('error' => 'Erro: Sua versão do PHP não possui suporte à função de descompactar.');
       return;
     }
 
@@ -133,14 +133,14 @@ class Unzipper {
       if (is_writeable($destination . '/')) {
         $zip->extractTo($destination);
         $zip->close();
-        $GLOBALS['status'] = array('success' => 'Files unzipped successfully');
+        $GLOBALS['status'] = array('success' => 'Arquivos extraídos com sucesso.');
       }
       else {
-        $GLOBALS['status'] = array('error' => 'Error: Directory not writeable by webserver.');
+        $GLOBALS['status'] = array('error' => 'Erro: Diretório sem permissão de escrita pelo servidor web.');
       }
     }
     else {
-      $GLOBALS['status'] = array('error' => 'Error: Cannot read .zip archive.');
+      $GLOBALS['status'] = array('error' => 'Erro: Não foi possível ler o arquivo .zip.');
     }
   }
 
@@ -155,7 +155,7 @@ class Unzipper {
   public static function extractGzipFile($archive, $destination) {
     // Check if zlib is enabled
     if (!function_exists('gzopen')) {
-      $GLOBALS['status'] = array('error' => 'Error: Your PHP has no zlib support enabled.');
+      $GLOBALS['status'] = array('error' => 'Erro: Seu PHP não possui a Zlib habilitada.');
       return;
     }
 
@@ -171,20 +171,20 @@ class Unzipper {
 
     // Check if file was extracted.
     if (file_exists($destination . '/' . $filename)) {
-      $GLOBALS['status'] = array('success' => 'File unzipped successfully.');
+      $GLOBALS['status'] = array('success' => 'Arquivo extraído com sucesso.');
 
       // If we had a tar.gz file, let's extract that tar file.
       if (pathinfo($destination . '/' . $filename, PATHINFO_EXTENSION) == 'tar') {
         $phar = new PharData($destination . '/' . $filename);
         if ($phar->extractTo($destination)) {
-          $GLOBALS['status'] = array('success' => 'Extracted tar.gz archive successfully.');
+          $GLOBALS['status'] = array('success' => 'Arquivo tar.gz extraído com sucesso.');
           // Delete .tar.
           unlink($destination . '/' . $filename);
         }
       }
     }
     else {
-      $GLOBALS['status'] = array('error' => 'Error unzipping file.');
+      $GLOBALS['status'] = array('error' => 'Erro ao descompactar o arquivo.');
     }
 
   }
@@ -200,7 +200,7 @@ class Unzipper {
   public static function extractRarArchive($archive, $destination) {
     // Check if webserver supports unzipping.
     if (!class_exists('RarArchive')) {
-      $GLOBALS['status'] = array('error' => 'Error: Your PHP version does not support .rar archive functionality. <a class="info" href="http://php.net/manual/en/rar.installation.php" target="_blank">How to install RarArchive</a>');
+      $GLOBALS['status'] = array('error' => 'Erro: Sua versão do PHP não possui suporte a arquivos .rar. <a class="info" href="http://php.net/manual/en/rar.installation.php" target="_blank">Como instalar RarArchive</a>');
       return;
     }
     // Check if archive is readable.
@@ -212,14 +212,14 @@ class Unzipper {
           $entry->extract($destination);
         }
         $rar->close();
-        $GLOBALS['status'] = array('success' => 'Files extracted successfully.');
+        $GLOBALS['status'] = array('success' => 'Arquivos extraídos com sucesso.');
       }
       else {
-        $GLOBALS['status'] = array('error' => 'Error: Directory not writeable by webserver.');
+        $GLOBALS['status'] = array('error' => 'Erro: Diretório sem permissão de escrita pelo servidor web.');
       }
     }
     else {
-      $GLOBALS['status'] = array('error' => 'Error: Cannot read .rar archive.');
+      $GLOBALS['status'] = array('error' => 'Erro: Não foi possível ler o arquivo .rar.');
     }
   }
 
@@ -295,7 +295,7 @@ class Zipper {
     }
     $z->close();
 
-    $GLOBALS['status'] = array('success' => 'Successfully created archive ' . $outZipPath);
+    $GLOBALS['status'] = array('success' => 'Arquivo criado com sucesso: ' . $outZipPath);
   }
 }
 ?>
@@ -303,7 +303,7 @@ class Zipper {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>File Unzipper + Zipper</title>
+  <title>Compactador + Descompactador de Arquivos</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <style type="text/css">
     <!--
@@ -391,32 +391,32 @@ class Zipper {
 <body>
 <p class="status status--<?php echo strtoupper(key($GLOBALS['status'])); ?>">
   Status: <?php echo reset($GLOBALS['status']); ?><br/>
-  <span class="small">Processing Time: <?php echo $time; ?> seconds</span>
+  <span class="small">Tempo de processamento: <?php echo $time; ?> segundos</span>
 </p>
 <form action="" method="POST">
   <fieldset>
-    <h1>Archive Unzipper</h1>
-    <label for="zipfile">Select .zip or .rar archive or .gz file you want to extract:</label>
+    <h1>Descompactador</h1>
+    <label for="zipfile">Escolha o arquivo .zip ou .rar ou .gz que deseja extrair:</label>
     <select name="zipfile" size="1" class="select">
       <?php foreach ($unzipper->zipfiles as $zip) {
         echo "<option>$zip</option>";
       }
       ?>
     </select>
-    <label for="extpath">Extraction path (optional):</label>
+    <label for="extpath">Pasta de destino (opcional):</label>
     <input type="text" name="extpath" class="form-field" />
-    <p class="info">Enter extraction path without leading or trailing slashes (e.g. "mypath"). If left empty current directory will be used.</p>
-    <input type="submit" name="dounzip" class="submit" value="Unzip Archive"/>
+    <p class="info">Informe a pasta para extração sem barras no início ou no final (exemplo: "subpasta"). Se deixado em branco o diretório atual será usado.</p>
+    <input type="submit" name="dounzip" class="submit" value="Descompactar"/>
   </fieldset>
 
   <fieldset>
-    <h1>Archive Zipper</h1>
-    <label for="zippath">Path that should be zipped (optional):</label>
+    <h1>Compactador</h1>
+    <label for="zippath">Pasta que deve ser compactada (opcional):</label>
     <input type="text" name="zippath" class="form-field" />
-    <p class="info">Enter path to be zipped without leading or trailing slashes (e.g. "zippath"). If left empty current directory will be used.</p>
-    <input type="submit" name="dozip" class="submit" value="Zip Archive"/>
+    <p class="info">Informe a pasta para compactação sem barras no início ou no final (exemplo: "subpasta"). Se deixado em branco o diretório atual será usado.</p>
+    <input type="submit" name="dozip" class="submit" value="Compactar"/>
   </fieldset>
 </form>
-<p class="version">Unzipper version: <?php echo VERSION; ?></p>
+<p class="version">Versão: <?php echo VERSION; ?></p>
 </body>
 </html>
